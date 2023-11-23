@@ -1,4 +1,4 @@
 import { server } from './server/server';
+const port = 5555;
 
-
-server.listen(5555, () => console.log('Matheus ta com o cacete-te no cú'));
+server.listen(port, () => console.log('Matheus ta com o cacete-te no cú'));
