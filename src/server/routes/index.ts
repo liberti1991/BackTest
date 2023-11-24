@@ -8,9 +8,6 @@ router.get('/test1', (request, response) => {
 });
 
 router.post('/test1noia', (request, response) => {
-
-
-
   return response.json('noia');
 });
 

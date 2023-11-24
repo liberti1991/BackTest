@@ -1,25 +1,46 @@
-// import bodyParser from 'body-parser';
-import express from 'express';
-import fs from 'fs';
-import moment from 'moment';
-import morganBody from 'morgan-body';
-import path from 'path';
+import express, { Request, Response } from 'express';
+import helmet from 'helmet';
+import morgan from 'morgan';
 import { router } from './routes';
 
 
-const server = express();
-server.use(express.json());
+const app = express();
 
-const log = fs.createWriteStream(path.join(__dirname, './logs', `${moment().format('YYYY-MM-DD')}.log`), { flags: 'a' });
-morganBody(server, {
-  noColors: true,
-  logAllReqHeader: true,
-  logAllResHeader: true,
-  stream: log,
+app.use(helmet());
+app.use(express.json());
+
+morgan.token('type', function (req: Request, res: Response) {
+  return req.headers['content-type'];
 });
 
-server.use(router);
+morgan.token('req-body', function (req: Request, res: Response) {
+  return JSON.stringify(req.body);
+});
 
-export { server };
+// Crie um array para armazenar os logs em vez de escrevê-los em um arquivo
+app.use(morgan((tokens, req: Request, res: Response) => {
+  console.log(tokens);
 
+  const logEntry = {
+    method: tokens.method(req, res),
+    url: tokens.url(req, res),
+    status: tokens.status(req, res),
+    contentLength: tokens.res(req, res, 'content-length'),
+    responseTime: tokens['response-time'](req, res),
+    date: tokens.date(req, res, 'web'),
+    type: tokens.type(req, res),
+    reqBody: tokens['req-body'](req, res),
+  };
+
+  console.log(logEntry);
+
+
+
+  return null; // Este retorno nulo impede que o morgan envie os logs para o stream padrão
+}));
+
+app.use(router);
+
+
+export { app };
 

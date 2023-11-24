@@ -1,4 +1,5 @@
-import { server } from './server/server';
+import { app } from './server/server';
 const port = 5555;
 
-server.listen(port, () => console.log('Matheus ta com o cacete-te no cú'));
+app.listen(port, () => console.log(`The application is running on the port: ${port}`));
+
